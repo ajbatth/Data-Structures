@@ -1,0 +1,74 @@
+class ST{
+    vector<int>seg,lazy;
+    int N;
+    bool orr;
+    void build(vector<int>&arr,int low,int high, int idx){
+        if(low==high){
+            seg[idx]=arr[low];
+            return ;
+        }
+        int mid=low+(high-low)/2;
+        build(arr,low,mid,2*idx+1);
+        build(arr,mid+1,high,2*idx+2);
+        seg[idx]=min(seg[2*idx+1],seg[2*idx+2]);
+    }
+
+    void update(int idx, int low, int high,int l, int r, int val){
+        if(lazy[idx]!=0){
+            seg[idx]+=lazy[idx];
+            if(low!=high){
+                lazy[2*idx+1]+=lazy[idx];
+                lazy[2*idx+2]+=lazy[idx];
+            }
+            lazy[idx]=0;
+        }
+        if(low>r || high<l || low>high)return;
+        if(low>=l && high<=r){
+            if(low!=high){
+                lazy[2*idx+1]+=val;
+                lazy[2*idx+2]+=val;
+            }
+            seg[idx]+=val;
+            return;
+        }
+        int mid=low+(high-low)/2;
+        update(idx*2+1,low,mid,l,r,val);
+        update(idx*2+2,mid+1,high,l,r,val);
+        seg[idx]=min(seg[2*idx+1],seg[2*idx+2]);    
+
+    }
+
+    int query(int idx, int low,int high, int left,int right){
+        if(lazy[idx]!=0){
+            seg[idx]+=lazy[idx];
+            if(low!=high){
+                lazy[2*idx+1]+=lazy[idx];
+                lazy[2*idx+2]+=lazy[idx];
+            }
+            lazy[idx]=0;
+        }
+        if(high<left || low>right || low>high)return 1e18;
+        if(low>=left && high<=right)return seg[idx];
+        int mid=low+(high-low)/2;
+        int l=query(idx*2+1,low,mid,left,right);
+        int r=query(idx*2+2,mid+1,high,left,right);
+        return min(l,r);
+    }
+public:
+    ST(vector<int>&v){
+        N=v.size();
+        seg.resize(4*N);
+        lazy.resize(4*N,0);
+        build(v,0,N-1,0);
+    }
+
+    void update(int l, int r, int val){
+        update(0,0,N-1,l,r,val);
+    }
+
+    int query(int L,int R){
+        return query(0,0,N-1,L,R);
+    }
+
+    
+};
