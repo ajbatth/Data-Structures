@@ -13,7 +13,7 @@ class STminimum{
     }
 
     void update(int idx, int low, int high,int i,int val){
-        if(low==i){
+        if(low==high){
             seg[idx]=val;
             return ;
         }
