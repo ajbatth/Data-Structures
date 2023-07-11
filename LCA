@@ -1,0 +1,53 @@
+class LowestCommonAncestor{
+public:
+    vector<vector<int>>up;
+    vector<int>level;
+    LowestCommonAncestor(int n,int max_bits){
+        up.resize(n+1,vector<int>(max_bits,-1));
+        level.resize(n+1,0);
+    }
+
+    void preCompute(vector<int>adj[], int node, int par){
+        for(int i=1;i<20;i++){
+            if(up[node][i-1]!=-1){
+                up[node][i]=up[up[node][i-1]][i-1];
+            }
+            else{
+                up[node][i]=-1;
+            }
+        }
+        for(auto child:adj[node]){
+            if(child==par)continue;
+            up[child][0]=node;
+            level[child]=level[node]+1;
+            preCompute(adj,child,node);
+        }
+    }
+    int lift(int node,int k){
+        if(k==0)return node;
+        int p=log2(k);
+        // cout<<node<<" "<<k<<" "<<p<<" "<<up[node][p]<<endl;
+        int parent=up[node][p];
+        if(parent==-1)return -1;
+        return lift(parent,k-(1<<p));
+    }
+
+    int LCA(int u, int v){
+        if(level[u]<level[v])swap(u,v);
+
+        int diff=level[u]-level[v];
+        u=lift(u,diff);
+        
+        if(u==v){
+            return u;
+        }
+        for(int i=19;i>=0;i--){
+            if(up[u][i]!=up[v][i]){
+                u=up[u][i];
+                v=up[v][i];
+            }
+        }
+        return up[u][0];
+    }
+
+};
