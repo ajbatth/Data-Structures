@@ -1,0 +1,28 @@
+class SparseMinimum{
+    int max_bits;
+public:
+    vector<vector<int>>sparse;
+    SparseMinimum(vector<int>&v, int bits){
+        max_bits=bits;
+        int N=v.size();
+        sparse.resize(N,vector<int>(bits,0));
+        buildSparseTable(v);
+    }
+
+    void buildSparseTable(vector<int>&v){
+        int n=v.size();
+        for(int L=n-1;L>=0;L--){
+            sparse[L][0]=v[L];
+            for(int w=1;w<max_bits;w++){
+                int R= L+(1<<w)-1;
+                if(R>=n)break;
+                sparse[L][w]=min(sparse[L][w-1],sparse[L+(1<<(w-1))][w-1]);
+            }
+        }
+    }
+
+    int minQuery(int L, int R){
+        int w=log2(R-L+1)+0.00001;
+        return min(sparse[L][w],sparse[R-(1<<w)+1][w]);
+    }
+};
