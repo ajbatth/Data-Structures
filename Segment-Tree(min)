@@ -1,0 +1,55 @@
+class STminimum{
+    vector<int>seg;
+    int N;
+    void build(vector<int>&arr,int low,int high, int idx){
+        if(low==high){
+            seg[idx]=arr[low];
+            return ;
+        }
+        int mid=low+(high-low)/2;
+        build(arr,low,mid,2*idx+1);
+        build(arr,mid+1,high,2*idx+2);
+        seg[idx]=min(seg[2*idx+1],seg[2*idx+2]);
+    }
+
+    void update(int idx, int low, int high,int i,int val){
+        if(low==i){
+            seg[idx]=val;
+            return ;
+        }
+        int mid=low+(high-low)/2;
+        if(i<=mid){
+            update(idx*2+1,low,mid,i,val);
+        }
+        else{
+            update(2*idx+2,mid+1,high,i,val);
+        }
+        seg[idx]=min(seg[2*idx+1],seg[2*idx+2]);
+
+    }
+
+    int query(int idx, int low,int high, int left,int right){
+        if(high<left || low>right)return 1e8;
+        if(low>=left && high<=right)return seg[idx];
+        int mid=low+(high-low)/2;
+        int l=query(idx*2+1,low,mid,left,right);
+        int r=query(idx*2+2,mid+1,high,left,right);
+        return min(l,r);
+    }
+public:
+    STminimum(vector<int>&v){
+        N=v.size();
+        seg.resize(4*N);
+        build(v,0,N-1,0);
+    }
+
+    void update(int idx,int val){
+        update(0,0,N-1,idx,val);
+    }
+
+    int query(int L,int R){
+        return query(0,0,N-1,L,R);
+    }
+
+    
+};
